@@ -1,11 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 
 app.use(express.json());
 
-// Temporary route placeholder (so app doesn't break)
-app.get("/", (req, res) => {
-  res.json({ message: "API running" });
-});
+// Routes
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
 
 module.exports = app;
