@@ -21,3 +21,15 @@ exports.addSweet = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+exports.getAllSweets = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM sweets ORDER BY id ASC"
+    );
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
