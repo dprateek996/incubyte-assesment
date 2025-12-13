@@ -19,7 +19,12 @@ export default function Register() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Registration failed");
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show specific error message from backend
+        throw new Error(data.error || "Registration failed");
+      }
 
       alert("Registration successful. Please login.");
       navigate("/login");

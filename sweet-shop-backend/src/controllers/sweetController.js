@@ -11,6 +11,7 @@ function serializeSweet(s) {
 exports.addSweet = async (req, res) => {
   try {
     const { name, quantity, price, unit, category } = req.body;
+    const userId = req.user.id; // Get userId from JWT token
 
     if (!name || quantity == null || price == null) {
       return res
@@ -35,7 +36,8 @@ exports.addSweet = async (req, res) => {
         category: category || "General",
         price: String(price), // Prisma Decimal accepts string safely
         quantity: Number(quantity),
-        unit: selectedUnit
+        unit: selectedUnit,
+        userId: userId // Associate sweet with user
       }
     });
 
@@ -48,7 +50,10 @@ exports.addSweet = async (req, res) => {
 
 exports.getAllSweets = async (req, res) => {
   try {
+    const userId = req.user.id; // Get userId from JWT token
+
     const sweets = await prisma.sweet.findMany({
+      where: { userId: userId }, // Filter by user
       orderBy: { id: "asc" }
     });
 
@@ -63,9 +68,23 @@ exports.updateSweet = async (req, res) => {
   try {
     const { id } = req.params;
     const { quantity } = req.body;
+    const userId = req.user.id; // Get userId from JWT token
 
     if (quantity == null) {
       return res.status(400).json({ error: "Quantity is required" });
+    }
+
+    // First check if sweet exists and belongs to user
+    const sweet = await prisma.sweet.findUnique({
+      where: { id: Number(id) }
+    });
+
+    if (!sweet) {
+      return res.status(404).json({ error: "Sweet not found" });
+    }
+
+    if (sweet.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden: You don't own this sweet" });
     }
 
     const updated = await prisma.sweet.update({
@@ -75,11 +94,6 @@ exports.updateSweet = async (req, res) => {
 
     return res.status(200).json(serializeSweet(updated));
   } catch (error) {
-    // Record not found: P2025 is commonly used for "not found" operations :contentReference[oaicite:4]{index=4}
-    if (error && error.code === "P2025") {
-      return res.status(404).json({ error: "Sweet not found" });
-    }
-
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
@@ -88,6 +102,20 @@ exports.updateSweet = async (req, res) => {
 exports.deleteSweet = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id; // Get userId from JWT token
+
+    // First check if sweet exists and belongs to user
+    const sweet = await prisma.sweet.findUnique({
+      where: { id: Number(id) }
+    });
+
+    if (!sweet) {
+      return res.status(404).json({ error: "Sweet not found" });
+    }
+
+    if (sweet.userId !== userId) {
+      return res.status(403).json({ error: "Forbidden: You don't own this sweet" });
+    }
 
     await prisma.sweet.delete({
       where: { id: Number(id) }
@@ -95,10 +123,6 @@ exports.deleteSweet = async (req, res) => {
 
     return res.status(200).json({ message: "Sweet deleted successfully" });
   } catch (error) {
-    if (error && error.code === "P2025") {
-      return res.status(404).json({ error: "Sweet not found" });
-    }
-
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }

@@ -7,10 +7,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
   password String
-  role     String @default("USER")
+  role     String  @default("USER")
+  sweets   Sweet[]
 
   @@map("users")
 }
@@ -22,6 +23,8 @@ model Sweet {
   price    Decimal
   quantity Int
   unit     String  @default("piece")
+  userId   Int
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sweets")
 }
