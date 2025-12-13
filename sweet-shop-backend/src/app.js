@@ -1,9 +1,19 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
-        
+
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -13,18 +13,16 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Invalid credentials");
+      if (!res.ok) throw new Error("Registration failed");
 
-      const data = await res.json();
-      localStorage.setItem("token", data.token);
-
-      navigate("/dashboard");
+      alert("Registration successful. Please login.");
+      navigate("/login");
     } catch (err) {
       alert(err.message);
     }
@@ -34,7 +32,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-neutral-100">
       <Card className="w-[360px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Register</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -44,31 +42,17 @@ export default function Login() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
-
             <Input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
-
             <Button type="submit" className="w-full">
-              Login
+              Create account
             </Button>
           </form>
-
-          <p className="text-sm text-center text-neutral-500 mt-4">
-            Don’t have an account?{" "}
-            <span
-              className="cursor-pointer text-neutral-900 underline"
-              onClick={() => navigate("/register")}
-            >
-              Register
-            </span>
-          </p>
         </CardContent>
       </Card>
     </div>

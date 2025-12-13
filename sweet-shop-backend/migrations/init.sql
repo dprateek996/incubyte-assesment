@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS sweets (
   name VARCHAR(255) NOT NULL,
   category VARCHAR(255) NOT NULL,
   price NUMERIC NOT NULL,
-  quantity INT NOT NULL
+  quantity INT NOT NULL,
+  unit VARCHAR(20) DEFAULT 'piece' NOT NULL
 );
