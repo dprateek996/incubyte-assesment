@@ -12,7 +12,7 @@ export default function Dashboard() {
   const token = localStorage.getItem("token");
 
   const fetchSweets = async () => {
-    const res = await fetch("http://localhost:3000/api/sweets", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/sweets`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -48,7 +48,7 @@ export default function Dashboard() {
       return;
     }
 
-    await fetch("http://localhost:3000/api/sweets", {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/sweets`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function Dashboard() {
   };
 
   const updateQty = async (id, qty) => {
-    await fetch(`http://localhost:3000/api/sweets/${id}`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/sweets/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function Dashboard() {
   };
 
   const deleteSweet = async (id) => {
-    await fetch(`http://localhost:3000/api/sweets/${id}`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/sweets/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

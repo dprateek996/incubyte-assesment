@@ -13,7 +13,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -53,6 +53,16 @@ export default function Register() {
               Create account
             </Button>
           </form>
+
+          <p className="text-sm text-center text-neutral-500 mt-4">
+            Already have an account?{" "}
+            <span
+              className="cursor-pointer text-neutral-900 underline"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </span>
+          </p>
         </CardContent>
       </Card>
     </div>
