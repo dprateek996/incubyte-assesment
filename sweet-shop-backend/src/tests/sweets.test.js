@@ -28,6 +28,7 @@ it("should add a new sweet", async () => {
     .set("Authorization", `Bearer ${token}`)
     .send({
       name: "Gulab Jamun",
+      category: "Indian Sweet",
       price: 10,
       quantity: 20
     });
