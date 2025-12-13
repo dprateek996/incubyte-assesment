@@ -37,3 +37,13 @@ it("should add a new sweet", async () => {
   expect(res.body).toHaveProperty("id");
   expect(res.body.name).toBe("Gulab Jamun");
 });
+
+it("should list all sweets", async () => {
+  const res = await request(app)
+    .get("/api/sweets")
+    .set("Authorization", `Bearer ${token}`);
+
+  expect(res.statusCode).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+  expect(res.body.length).toBeGreaterThan(0);
+});
