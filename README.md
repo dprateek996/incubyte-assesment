@@ -1,4 +1,3 @@
-
 # 🍬 Sweet Shop Management System
 
 **A simple, secure way to manage your confectionery inventory.**
@@ -69,7 +68,7 @@ npm run dev             # Launch the app!
 
 ---
 
-## � API Overview
+## API Overview
 
 Here are the main ways the app talks to the server:
 
@@ -83,7 +82,45 @@ Here are the main ways the app talks to the server:
 
 ---
 
+## My AI Usage
+
+I used a few AI tools during development to accelerate certain tasks while keeping full control over design and implementation. Below is a transparent summary of what I used AI for and what I did not.
+
+### AI Tools Used
+
+• ChatGPT
+• GitHub Copilot (limited usage)
+
+### How I Used AI
+
+• Used ChatGPT to:
+  • Clarify backend architectural decisions
+  • Review REST API design
+  • Debug errors and understand test failures
+  • Improve commit message clarity
+
+• Used GitHub Copilot occasionally for:
+  • Boilerplate suggestions (e.g., controller or route skeletons)
+
+### What I Did NOT Use AI For
+
+• I did not auto-generate the full project
+• I did not copy-paste complete solutions blindly
+• I did not rely on AI for business logic decisions
+
+### Reflection
+
+AI acted as a supporting tool, similar to documentation or StackOverflow. All design decisions, implementation steps, debugging, and test-driven development flow were done and validated by me.
+
+Using AI helped me:
+  • Move faster without compromising understanding
+  • Catch mistakes earlier
+  • Maintain clean, readable code
+
+I can confidently explain every line of code in this project.
+
+---
+
 <p align="center">
   Built with ❤️ by <a href="https://github.com/dprateek996">Prateek Dwivedi</a>
 </p>
-
