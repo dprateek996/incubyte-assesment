@@ -1,20 +1,25 @@
 const request = require("supertest");
 const app = require("../app");
+const prisma = require("../db");
 
 let token;
+let email;
+let sweetName;
 
 beforeAll(async () => {
+  email = `sweetuser_${Date.now()}@example.com`;
+
   await request(app)
     .post("/api/auth/register")
     .send({
-      email: "sweetuser@example.com",
+      email,
       password: "password123"
     });
 
   const res = await request(app)
     .post("/api/auth/login")
     .send({
-      email: "sweetuser@example.com",
+      email,
       password: "password123"
     });
 
@@ -22,11 +27,13 @@ beforeAll(async () => {
 });
 
 it("should add a new sweet", async () => {
+  sweetName = `Gulab Jamun ${Date.now()}`;
+
   const res = await request(app)
     .post("/api/sweets")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      name: "Gulab Jamun",
+      name: sweetName,
       category: "Indian Sweet",
       price: 10,
       quantity: 20
@@ -51,15 +58,24 @@ it("should delete a sweet by id", async () => {
 
   expect(listRes.body.length).toBeGreaterThan(0);
 
-  const sweetId = listRes.body[0].id;
+  const target = listRes.body.find((s) => s.name === sweetName) || listRes.body[0];
+  const sweetId = target.id;
 
   const res = await request(app)
     .delete(`/api/sweets/${sweetId}`)
     .set("Authorization", `Bearer ${token}`);
 
   expect(res.statusCode).toBe(200);
-  expect(res.body).toHaveProperty(
-    "message",
-    "Sweet deleted successfully"
-  );
+  expect(res.body).toHaveProperty("message", "Sweet deleted successfully");
+});
+
+afterAll(async () => {
+  // cleanup only what we created
+  if (sweetName) {
+    await prisma.sweet.deleteMany({ where: { name: sweetName } });
+  }
+  if (email) {
+    await prisma.user.deleteMany({ where: { email } });
+  }
+  await prisma.$disconnect();
 });

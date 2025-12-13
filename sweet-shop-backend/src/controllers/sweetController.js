@@ -1,14 +1,24 @@
-const pool = require("../db");
+const prisma = require("../db");
+
+function serializeSweet(s) {
+  if (!s) return s;
+  return {
+    ...s,
+    price: s.price != null ? Number(s.price) : s.price
+  };
+}
 
 exports.addSweet = async (req, res) => {
   try {
-    const { name, quantity, price, unit } = req.body;
+    const { name, quantity, price, unit, category } = req.body;
 
     if (!name || quantity == null || price == null) {
-      return res.status(400).json({ error: "Name, quantity, and price required" });
+      return res
+        .status(400)
+        .json({ error: "Name, quantity, and price required" });
     }
 
-    if (price < 0) {
+    if (Number(price) < 0) {
       return res.status(400).json({ error: "Price must be non-negative" });
     }
 
@@ -19,31 +29,36 @@ exports.addSweet = async (req, res) => {
       return res.status(400).json({ error: "Unit must be 'gram' or 'piece'" });
     }
 
-    const result = await pool.query(
-      `INSERT INTO sweets (name, category, price, quantity, unit)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [name, "General", price, quantity, selectedUnit]
-    );
+    const created = await prisma.sweet.create({
+      data: {
+        name,
+        category: category || "General",
+        price: String(price), // Prisma Decimal accepts string safely
+        quantity: Number(quantity),
+        unit: selectedUnit
+      }
+    });
 
-    return res.status(201).json(result.rows[0]);
+    return res.status(201).json(serializeSweet(created));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
 };
+
 exports.getAllSweets = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM sweets ORDER BY id ASC"
-    );
+    const sweets = await prisma.sweet.findMany({
+      orderBy: { id: "asc" }
+    });
 
-    return res.status(200).json(result.rows);
+    return res.status(200).json(sweets.map(serializeSweet));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
 };
+
 exports.updateSweet = async (req, res) => {
   try {
     const { id } = req.params;
@@ -53,17 +68,18 @@ exports.updateSweet = async (req, res) => {
       return res.status(400).json({ error: "Quantity is required" });
     }
 
-    const result = await pool.query(
-      "UPDATE sweets SET quantity = $1 WHERE id = $2 RETURNING *",
-      [quantity, id]
-    );
+    const updated = await prisma.sweet.update({
+      where: { id: Number(id) },
+      data: { quantity: Number(quantity) }
+    });
 
-    if (result.rowCount === 0) {
+    return res.status(200).json(serializeSweet(updated));
+  } catch (error) {
+    // Record not found: P2025 is commonly used for "not found" operations :contentReference[oaicite:4]{index=4}
+    if (error && error.code === "P2025") {
       return res.status(404).json({ error: "Sweet not found" });
     }
 
-    return res.status(200).json(result.rows[0]);
-  } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
@@ -73,19 +89,16 @@ exports.deleteSweet = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      "DELETE FROM sweets WHERE id = $1 RETURNING *",
-      [id]
-    );
+    await prisma.sweet.delete({
+      where: { id: Number(id) }
+    });
 
-    if (result.rowCount === 0) {
+    return res.status(200).json({ message: "Sweet deleted successfully" });
+  } catch (error) {
+    if (error && error.code === "P2025") {
       return res.status(404).json({ error: "Sweet not found" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Sweet deleted successfully" });
-  } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
